@@ -21,6 +21,7 @@ namespace DatingApp.API.Helpers
           var paginationHeader = new PaginationHeader(currentPage, itemsPerPage, totalItems, totalPages);
           response.Headers.Add("Pagination", JsonConvert.SerializeObject(paginationHeader, camelCaseFormatter));
           response.Headers.Add("Access-Control-Allow-Origin", "Pagination");
+          response.Headers.Add("Access-Control-Expose-Headers", "Pagination");
         }
 
         public static int CalculateAge(this DateTime theDateTime){

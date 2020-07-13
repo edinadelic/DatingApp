@@ -3,9 +3,8 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../_models/user';
-import { AuthService } from './auth.service';
-import { PaginatedResult } from '../_models/pagination';
 import { map } from 'rxjs/operators';
+import { PaginatedResult } from '../_models/pagination';
 
 
 @Injectable({
