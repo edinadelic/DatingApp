@@ -39,10 +39,11 @@ namespace DatingApp.API.Controllers
             {
                 userParams.Gender = userFromRepo.Gender == "male" ? "female" : "male";
             }
-            var users = await _repo.GetUsers(userParams);
+            var usersFromRepo = await _repo.GetUsers(userParams);
 
-            var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
-            Response.AddPaggination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+            var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(usersFromRepo);
+            Response.AddPaggination(usersFromRepo.CurrentPage, usersFromRepo.PageSize, 
+            usersFromRepo.TotalCount, usersFromRepo.TotalPages);
 
             return Ok(usersToReturn);
         }
