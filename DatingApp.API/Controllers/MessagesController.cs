@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -31,10 +32,12 @@ namespace DatingApp.API.Controllers
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
             var messageFromRepo = await _repo.GetMessage(id);
+            var message = _mapper.Map<MessageToReturnDto>(messageFromRepo);
+            
             if (messageFromRepo == null)
                 return NotFound();
 
-            return Ok(messageFromRepo);
+            return Ok(message);
         }
         
         [HttpGet("thread/{recipientId}")]
@@ -51,7 +54,7 @@ namespace DatingApp.API.Controllers
         public async Task<IActionResult> GetMessages(int userId, [FromQuery] MessageParams messageParams)
         {
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                return Unauthorized();
+                return Unauthorized(); 
             messageParams.UserId = userId;
             var messagesFromRepo = await _repo.GetMessagesForUser(messageParams);
             var messages = _mapper.Map<IEnumerable<MessageToReturnDto>>(messagesFromRepo);
@@ -71,6 +74,7 @@ namespace DatingApp.API.Controllers
             messageFoCreationDto.SenderId = userId;
 
             var recipient = await _repo.GetUser(messageFoCreationDto.RecipientId);
+            var sender = await _repo.GetUser(userId);
             if (recipient == null)
                 return BadRequest("Could not find user!");
 
@@ -78,6 +82,8 @@ namespace DatingApp.API.Controllers
             var message = _mapper.Map<Message>(messageFoCreationDto);
             _repo.Add(message);
             var messageToReturn = _mapper.Map<MessageToReturnDto>(message);
+            messageToReturn.SenderPhotoUrl= sender.Photos.FirstOrDefault(p => p.IsMain).Url;
+            messageToReturn.SenderKnownAs = sender.KnownAs;
 
             if (await _repo.SaveAll())
                return CreatedAtRoute("GetMessage", new { userId, id = message.Id }, messageToReturn);
