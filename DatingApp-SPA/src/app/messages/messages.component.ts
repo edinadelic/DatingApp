@@ -17,7 +17,7 @@ pagination: Pagination;
 messageContainer = 'Unread';
 
   constructor(private route: ActivatedRoute, private userService: UserService, private alertify: AlertifyService,
-              private autService: AuthService) { }
+              private authService: AuthService) { }
 
   ngOnInit() {
     this.route.data.subscribe(data => {
@@ -26,7 +26,7 @@ messageContainer = 'Unread';
     });
     }
   loadMessages(){
-    this.userService.getMessages(this.autService.decodedToken.nameid, this.pagination.currentPage,
+    this.userService.getMessages(this.authService.decodedToken.nameid, this.pagination.currentPage,
       this.pagination.itemsPerPage, this.messageContainer).subscribe((res: PaginatedResult<Message[]>) => {
         this.messages = res.result;
         this.pagination = res.pagination;
@@ -34,6 +34,17 @@ messageContainer = 'Unread';
         this.alertify.error(error);
       }
     );
+  }
+  deleteMessage(id: number){
+    this.alertify.confirm('Are you sure you want to delete this message', () => {
+      this.userService.deleteMessage(id, this.authService.decodedToken.nameid)
+      .subscribe(() => {
+        this.messages.splice(this.messages.findIndex(m => m.id === id), 1);
+        this.alertify.success('Message has been deleted');
+      }, error => {
+        this.alertify.error('Failed to delete message');
+      });
+    });
   }
   pageChanged(event: any): void {
     this.pagination.currentPage = event.page;
