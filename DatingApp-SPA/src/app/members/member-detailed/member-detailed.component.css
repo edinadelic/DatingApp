@@ -13,3 +13,8 @@
     border-top: none;
 }
 .ngx-gallery { display: inline-block; margin-bottom: 20px; }
+
+.member-name {
+    padding-left: 15px;
+    margin-bottom: 17px;
+}
